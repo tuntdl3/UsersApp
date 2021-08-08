@@ -24,7 +24,19 @@ class RealmRepository {
 	
 	func saveUserList(users: [User]) {
 		try! realm.write {
-			realm.add(users, update: .modified)
+			users.forEach { user in
+				if let oldUser = realm.object(ofType: User.self, forPrimaryKey: user.id) {
+					let newUser = user
+					newUser.name = oldUser.name
+					newUser.location = oldUser.location
+					newUser.followers = oldUser.followers
+					newUser.following = oldUser.following
+					newUser.publicRepos = oldUser.publicRepos
+					realm.add(users, update: .modified)
+				} else {
+					realm.add(user, update: .modified)
+				}
+			}
 		}
 	}
 	
