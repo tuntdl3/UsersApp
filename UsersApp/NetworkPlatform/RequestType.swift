@@ -9,12 +9,12 @@ import Alamofire
 
 enum RequestType {
 	case users
-	case userDetail(id: Int)
+	case userDetail(login: String)
 	
 	var resource: (method: HTTPMethod, route: String) {
 		switch self {
 			case .users: return (.get,"users")
-			case .userDetail(let id): return (.get, "users/\(id)")
+			case .userDetail(let login): return (.get, "users/\(login)")
 		}
 	}
 }

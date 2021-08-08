@@ -40,7 +40,7 @@ class UserDetailViewController: BaseViewController {
 	}
 	
 	func fetchData() {
-		NetworkUseCase.shared.getUserDetailBy(id: user.id) { user in
+		NetworkUseCase.shared.getUserDetailBy(login: user.login) { user in
 			self.user = user
 			self.tableView.reloadData()
 			self.refreshControl.endRefreshing()

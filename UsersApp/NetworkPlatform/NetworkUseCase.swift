@@ -52,9 +52,9 @@ class NetworkUseCase {
 		
 	}
 	
-	func getUserDetailBy(id: Int, completionHandler: @escaping (User) -> Void) {
+	func getUserDetailBy(login: String, completionHandler: @escaping (User) -> Void) {
 		
-		requestBy(type: .userDetail(id: id)) { response in
+		requestBy(type: .userDetail(login: login)) { response in
 			switch response.result {
 				
 				case .success(let json):
