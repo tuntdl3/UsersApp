@@ -6,6 +6,10 @@
 //
 
 import UIKit
+import RxCocoa
+import RxSwift
+import Reusable
+import Then
 
 class UserDetailViewController: BaseViewController {
 	
@@ -15,7 +19,9 @@ class UserDetailViewController: BaseViewController {
 	var followCellHeight: CGFloat { return 80 }
 	var bioCellHeight: CGFloat { return UIScreen.main.bounds.height - infoCellHeight - followCellHeight }
 	
-	var user: User!
+	var login: String = ""
+	var viewModel = UserViewModel()
+	var user = User()
 	
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,13 +31,48 @@ class UserDetailViewController: BaseViewController {
     }
 	
 	func configTableView() {
-		tableView.register(UINib(nibName: "UserDetailTableViewCell", bundle: nil), forCellReuseIdentifier: "infoCell")
-		tableView.register(UINib(nibName: "UserFollowTableViewCell", bundle: nil), forCellReuseIdentifier: "followCell")
-		tableView.register(UINib(nibName: "UserBioTableViewCell", bundle: nil), forCellReuseIdentifier: "bioCell")
 		tableView.delegate = self
-		tableView.dataSource = self
+		tableView.rowHeight = UITableView.automaticDimension
+		tableView.register(cellType: UserDetailTableViewCell.self)
+		tableView.register(cellType: UserFollowTableViewCell.self)
+		tableView.register(cellType: UserBioTableViewCell.self)
 		tableView.tableFooterView = UIView()
 		tableView.addSubview(refreshControl)
+		
+		
+		viewModel.userDetail
+			.do(onNext: { [unowned self] user in
+				self.user = user
+				self.refreshControl.endRefreshing()
+			})
+			.map { user in [user, user, user] }
+			.bind(to: tableView.rx.items) {[unowned self] tableView, index, setting in
+				if index == 0 {
+					return tableView.dequeueReusableCell(
+						for: IndexPath(row: index, section: 0),
+						cellType: UserDetailTableViewCell.self)
+						.then {
+							$0.loadUserInfo(avatarURL: self.user.avatarUrl, name: self.user.name, login: self.user.login, location: self.user.location)
+						}
+				}
+				
+				if index == 1 {
+					return tableView.dequeueReusableCell(
+						for: IndexPath(row: index, section: 0),
+						cellType: UserFollowTableViewCell.self)
+						.then {
+							$0.loadUserData(follower: self.user.followers, following: self.user.following, repo: self.user.publicRepos)
+						}
+				}
+				
+				return tableView.dequeueReusableCell(
+					for: IndexPath(row: index, section: 0),
+					cellType: UserBioTableViewCell.self)
+					.then {
+						$0.loadBioUser(self.user.bio)
+					}
+			}
+			.disposed(by: bag)
 	}
 	
 	override func refresh(_ sender: AnyObject) {
@@ -40,54 +81,12 @@ class UserDetailViewController: BaseViewController {
 	}
 	
 	func fetchData() {
-		
-		if NetworkUseCase.shared.isConnectedToInternet {
-			NetworkUseCase.shared.getUserDetailBy(login: user.login) { user in
-				self.refreshDataTableView(data: user)
-			}
-		} else {
-			if let data = RealmRepository.shared.getUserById(user.id) {
-				self.refreshDataTableView(data: data)
-			} else {
-				showAlert(title: "Error", message: "Please try again later")
-			}
-		}
-	}
-	
-	func refreshDataTableView(data: User) {
-		self.user = data
-		self.tableView.reloadData()
-		self.refreshControl.endRefreshing()
+		viewModel.fetchUserDetailByLogin(login: login)
 	}
 }
 
 
-extension UserDetailViewController: UITableViewDelegate, UITableViewDataSource {
-	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return 3
-	}
-	
-	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		
-		if indexPath.row == 0, let cell = tableView.dequeueReusableCell(withIdentifier: "infoCell", for: indexPath) as? UserDetailTableViewCell {
-			cell.loadUserInfo(avatarURL: user.avatarUrl, name: user.name, login: user.login, location: user.location)
-			return cell
-		}
-		
-		
-		if  indexPath.row == 1, let cell = tableView.dequeueReusableCell(withIdentifier: "followCell", for: indexPath) as? UserFollowTableViewCell {
-			cell.loadUserData(follower: user.followers, following: user.following, repo: user.publicRepos)
-			return cell
-		}
-		
-		if indexPath.row == 2, let cell = tableView.dequeueReusableCell(withIdentifier: "bioCell", for: indexPath) as? UserBioTableViewCell {
-			cell.loadBioUser(user.bio)
-			return cell
-		}
-		
-		return UITableViewCell()
-	}
-	
+extension UserDetailViewController: UITableViewDelegate {
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
 		return indexPath.row == 0 ? infoCellHeight : indexPath.row == 1 ? followCellHeight : bioCellHeight
 	}

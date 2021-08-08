@@ -154,16 +154,17 @@
 		237E00AD26BE8071005FD466 /* UsersApp */ = {
 			isa = PBXGroup;
 			children = (
+				237E011626BFA0A2005FD466 /* LocalDatabase */,
 				237E00FF26BF03DA005FD466 /* Resource */,
 				237E00E926BEE796005FD466 /* NetworkPlatform */,
 				237E00E826BEE780005FD466 /* Screen */,
+				237E011726BFA0BA005FD466 /* ViewModel */,
 				237E00AE26BE8071005FD466 /* AppDelegate.swift */,
 				237E010F26BF8871005FD466 /* SceneDelegate.swift */,
 				237E00B426BE8071005FD466 /* Main.storyboard */,
 				237E00B726BE8073005FD466 /* Assets.xcassets */,
 				237E00B926BE8073005FD466 /* LaunchScreen.storyboard */,
 				237E00BC26BE8073005FD466 /* Info.plist */,
-				237E00E626BEE1DC005FD466 /* UserViewModel.swift */,
 			);
 			path = UsersApp;
 			sourceTree = "<group>";
@@ -208,8 +209,7 @@
 		237E00EA26BEE7DA005FD466 /* Users */ = {
 			isa = PBXGroup;
 			children = (
-				237E00E226BECD88005FD466 /* UserTableViewCell.swift */,
-				237E00E326BECD88005FD466 /* UserTableViewCell.xib */,
+				237E011126BF90A8005FD466 /* Cell */,
 				237E00B226BE8071005FD466 /* HomeViewController.swift */,
 			);
 			path = Users;
@@ -243,7 +243,6 @@
 				237E010626BF0477005FD466 /* Entities */,
 				237E010226BF040A005FD466 /* UIView+Ext.swift */,
 				237E010426BF044E005FD466 /* Constant.swift */,
-				237E010D26BF790A005FD466 /* RealmRepository.swift */,
 			);
 			path = Resource;
 			sourceTree = "<group>";
@@ -255,6 +254,31 @@
 				237E010926BF0491005FD466 /* User+Codable.swift */,
 			);
 			path = Entities;
+			sourceTree = "<group>";
+		};
+		237E011126BF90A8005FD466 /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				237E00E226BECD88005FD466 /* UserTableViewCell.swift */,
+				237E00E326BECD88005FD466 /* UserTableViewCell.xib */,
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
+		237E011626BFA0A2005FD466 /* LocalDatabase */ = {
+			isa = PBXGroup;
+			children = (
+				237E010D26BF790A005FD466 /* RealmRepository.swift */,
+			);
+			path = LocalDatabase;
+			sourceTree = "<group>";
+		};
+		237E011726BFA0BA005FD466 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				237E00E626BEE1DC005FD466 /* UserViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		400B540E08A520A939CCDA81 /* Pods */ = {

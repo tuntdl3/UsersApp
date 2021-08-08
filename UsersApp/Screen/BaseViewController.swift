@@ -6,10 +6,12 @@
 //
 
 import UIKit
+import RxSwift
 
 class BaseViewController: UIViewController {
 
 	let refreshControl = UIRefreshControl()
+	var bag = DisposeBag()
 	
     override func viewDidLoad() {
         super.viewDidLoad()

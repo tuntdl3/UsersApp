@@ -6,8 +6,9 @@
 //
 
 import UIKit
+import Reusable
 
-class UserFollowTableViewCell: UITableViewCell {
+class UserFollowTableViewCell: UITableViewCell, NibReusable {
 
 	@IBOutlet weak var followerNumberLB: UILabel!
 	@IBOutlet weak var followerLB: UILabel!

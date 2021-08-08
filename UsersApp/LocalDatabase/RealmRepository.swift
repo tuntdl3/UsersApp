@@ -38,8 +38,10 @@ class RealmRepository {
 		Array(realm.objects(User.self))
 	}
 	
-	func getUserById(_ id: Int) -> User? {
-		realm.object(ofType: User.self, forPrimaryKey: id)
+	func getUserByLogin(_ login: String) -> User? {
+		
+		let users = realm.objects(User.self)
+		return users.filter("login = %@", login).first
 	}
 	
 }

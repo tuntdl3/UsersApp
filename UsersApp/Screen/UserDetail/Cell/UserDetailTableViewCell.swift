@@ -6,7 +6,9 @@
 //
 
 import UIKit
-class UserDetailTableViewCell: UITableViewCell {
+import Reusable
+
+class UserDetailTableViewCell: UITableViewCell, NibReusable  {
 
 	@IBOutlet weak var bgImageView: UIImageView!
 	@IBOutlet weak var avatartImageView: UIImageView!

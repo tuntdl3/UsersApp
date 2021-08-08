@@ -7,12 +7,14 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
 
 class HomeViewController: BaseViewController {
 	
 	@IBOutlet weak var tableView: UITableView!
 	
-	var users = [User]()
+	var viewModel = UserViewModel()
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -24,9 +26,23 @@ class HomeViewController: BaseViewController {
 	func configTableView() {
 		tableView.register(UINib(nibName: "UserTableViewCell", bundle: nil), forCellReuseIdentifier: "cell")
 		tableView.delegate = self
-		tableView.dataSource = self
 		tableView.tableFooterView = UIView()
 		tableView.addSubview(refreshControl)
+		
+		viewModel.items
+			.do(onNext: {[unowned self] _ in
+				self.refreshControl.endRefreshing()
+			})
+			.bind(to: tableView.rx.items(
+					cellIdentifier: "cell",
+					cellType: UserTableViewCell.self))
+			{ row, model, cell in
+				cell.user = model
+			}.disposed(by: bag)
+		
+		tableView.rx.modelSelected(User.self).bind { user in
+			self.pushToDetail(login: user.login)
+		}.disposed(by: bag)
 	}
 	
 	@objc override func refresh(_ sender: AnyObject) {
@@ -35,51 +51,21 @@ class HomeViewController: BaseViewController {
 	}
 	
 	func fetchData() {
-		if NetworkUseCase.shared.isConnectedToInternet {
-			NetworkUseCase.shared.getListUsers { data in
-				self.refreshDataTableView(data: data)
-			}
-		} else {
-			let data = RealmRepository.shared.getUserList()
-			self.refreshDataTableView(data: data)
-		}
+		viewModel.fetchListUserData()
 	}
 	
-	func refreshDataTableView(data: [User]) {
-		self.users = data
-		self.tableView.reloadData()
-		self.refreshControl.endRefreshing()
-	}
-	
-	func pushToDetail(user: User) {
+	func pushToDetail(login: String) {
 		let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
 		let vc = storyBoard.instantiateViewController(withIdentifier: "UserDetailViewController") as! UserDetailViewController
-		vc.user = user
+		vc.login = login
 		self.navigationController?.pushViewController(vc, animated: true)
 	}
 }
 
-extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
-	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return users.count
-	}
-	
-	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		
-		if let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? UserTableViewCell {
-			cell.user = users[indexPath.row]
-			return cell
-		}
-		return UITableViewCell()
-	}
+extension HomeViewController: UITableViewDelegate {
 	
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
 		return 80
-	}
-	
-	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		tableView.deselectRow(at: indexPath, animated: false)
-		pushToDetail(user: users[indexPath.row])
 	}
 }
 

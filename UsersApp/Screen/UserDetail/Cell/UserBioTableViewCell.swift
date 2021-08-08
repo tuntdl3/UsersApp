@@ -6,8 +6,9 @@
 //
 
 import UIKit
+import Reusable
 
-class UserBioTableViewCell: UITableViewCell {
+class UserBioTableViewCell: UITableViewCell, NibReusable {
 
 	@IBOutlet weak var bioLB: UILabel!
 	@IBOutlet weak var bioTV: UITextView!
