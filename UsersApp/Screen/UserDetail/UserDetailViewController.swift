@@ -40,11 +40,24 @@ class UserDetailViewController: BaseViewController {
 	}
 	
 	func fetchData() {
-		NetworkUseCase.shared.getUserDetailBy(login: user.login) { user in
-			self.user = user
-			self.tableView.reloadData()
-			self.refreshControl.endRefreshing()
+		
+		if NetworkUseCase.shared.isConnectedToInternet {
+			NetworkUseCase.shared.getUserDetailBy(login: user.login) { user in
+				self.refreshDataTableView(data: user)
+			}
+		} else {
+			if let data = RealmRepository.shared.getUserById(user.id) {
+				self.refreshDataTableView(data: data)
+			} else {
+				showAlert(title: "Error", message: "Please try again later")
+			}
 		}
+	}
+	
+	func refreshDataTableView(data: User) {
+		self.user = data
+		self.tableView.reloadData()
+		self.refreshControl.endRefreshing()
 	}
 }
 

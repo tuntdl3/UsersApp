@@ -24,4 +24,11 @@ class BaseViewController: UIViewController {
 	
 	@objc func refresh(_ sender: AnyObject) {
 	}
+	
+	func showAlert(title: String, message: String, handler: ((UIAlertAction) -> Void)? = nil) {
+		let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+		let defaultButton = UIAlertAction(title: "OK", style: .default, handler: handler)
+		alert.addAction(defaultButton)
+		self.present(alert, animated: true, completion: nil)
+	}
 }
